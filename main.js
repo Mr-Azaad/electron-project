@@ -1,43 +1,93 @@
-// Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const {
+    app,
+    BrowserWindow,
+    webContents,
+    screen,
+    shell
+} = require('electron')
 const path = require('path')
 
-function createWindow () {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
+var mainWindow;
 
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+function createWindow(address, prop) {
+
+    let win = new BrowserWindow(prop)
+
+    //    const mainWindow = new BrowserWindow({
+    //        width: 800,
+    //        height: 600,
+    //        title: 'u boy',                             // come in front, if html file have not a title
+    //        backgroundColor: '#e2e2e2',
+    //        webPreferences: {
+    //            preload: path.join(__dirname, 'preload.js')
+    //        }
+    //    })
+
+    win.loadFile(address)
+    //    console.log(webContents.getAllWebContents())              //  to show all web contents related
+
+    return win
+
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+
+
 app.whenReady().then(() => {
-  createWindow()
-  
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+
+    console.log(app.getLocale())
+
+    mainWindow = createWindow('index.html', {
+        width: 800,
+        height: 600,
+        title: 'u boy',
+        backgroundColor: '#e2e2e2',
+        //   icon: path.join(__dirname, 'assets/img14.jpg')        // to add icon to app
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js')
+        }
+    })
+
+    /*   createWindow('index.html', {
+           width: 300,
+           height: 300,
+           title: 'u boy',
+           backgroundColor: '#e2e2e2',
+           webPreferences: {
+               preload: path.join(__dirname, 'preload.js')
+           }
+       }) */
+
+    mainWindow.on('activate', function () {
+        if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
+    //    console.log('==>   ', screen.getAllDisplays())                    // to get info of all displays attached 
+    //    console.log('==>   ', screen.getPrimaryDisplay())                 // to get info of primary display
+
+    mainWindow.on('blur', () => {
+
+        mainWindow.setIcon(path.join(__dirname, 'assets/logan.jpg'))
+
+    })
+    
+    mainWindow.on('focus', () => {
+
+        mainWindow.setIcon(path.join(__dirname, 'assets/img14.jpg'))
+
+    })
+
+//    let filepath = app.getAppPath() + '\\README.md'       // open to use file in shell
+//    shell.showItemInFolder(filepath)                      //this is to show any file in folder
+//    shell.openItem(filepath)                              //this will open that file
+    
+//    let fp = 'file:\\' + app.getAppPath() + '\\index.html'  //  to open externally
+//    shell.openExternal(fp)                                  //  open it in Browser
+    
+
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+//    shell.beep()          // make beep sound
+
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
+    if (process.platform !== 'darwin') app.quit()
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
